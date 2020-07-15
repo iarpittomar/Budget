@@ -1,7 +1,71 @@
 //BUDGER Controller
 
 var budgetController = (function () {
-  //some code
+  var Expense = function (id, desc, value) {
+    this.id = id;
+    this.desc = desc;
+    this.value = value;
+  };
+
+  var Income = function (id, desc, value) {
+    this.id = id;
+    this.desc = desc;
+    this.value = value;
+  };
+
+  var data = {
+    allItems: {
+      exp: [],
+      inc: [],
+    },
+    totals: {
+      exp: 0,
+      inc: 0,
+    },
+  };
+
+  function _addItem(type, desc, val) {
+    var newItem, ID;
+
+    //create new ID
+    if (data.allItems[type].length > 0) {
+      ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
+    } else {
+      ID = 0;
+    }
+
+    //create new item based on 'inc' or 'exp' type
+    if (type === "exp") {
+      newItem = new Expense(ID, desc, val);
+    } else if (type === "inc") {
+      newItem = new Income(ID, desc, val);
+    }
+
+    //push it into our data structure
+    data.allItems[type].push(newItem);
+
+    //return the new element
+    return newItem;
+  }
+
+  function _deleteItem(type, id) {
+    var ids, index;
+
+    ids = data.allItems[type].map(function (item, index) {
+      return item.id;
+    });
+
+    index = ids.indexOf(id);
+
+    if (index !== -1) {
+      data.allItems[type].splice(index, 1);
+    }
+  }
+
+  return {
+    addItem: _addItem,
+    deleteItem: _deleteItem,
+  };
 })();
 
 //UI Controller
@@ -25,9 +89,16 @@ var UIController = (function () {
     };
   };
 
+  function _addListItem(obj, type) {
+    //create html string with placeholder text
+    //replace the placeholder text with some actual data
+    //Insert the HTML code into the DOM
+  }
+
   return {
     getInput: _getInput,
     getDomString: _getDomString,
+    addListItem: _addListItem,
   };
 })();
 
@@ -46,11 +117,14 @@ var controller = (function (budgetCtrl, UICtrl) {
   };
 
   var ctrlAddItem = function () {
+    var input, newItem;
     //1.Get the field input data
-    var input = UICtrl.getInput();
+    input = UICtrl.getInput();
     console.log(input);
     //2. Add the item to the budget controller
+    newItem = budgetCtrl.addItem(input.type, input.desc, input.value);
     //3. Add the item to the UI
+    UICtrl.addListItem(newItem);
     //4. Calculate the budget
     //5. Display the budget
   };
